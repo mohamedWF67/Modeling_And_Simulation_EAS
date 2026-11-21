@@ -68,7 +68,7 @@
                          ShowClose="False"
                          Height="48">
                 <ui:TitleBar.Icon>
-                    <ui:SymbolIcon Symbol="ClothesHanger24"
+                    <ui:SymbolIcon Symbol="Box24"
                                    Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
                 </ui:TitleBar.Icon>
                 <ui:TitleBar.Header>

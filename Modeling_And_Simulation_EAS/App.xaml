@@ -9,7 +9,6 @@
             <ResourceDictionary.MergedDictionaries>
                 <ui:ThemesDictionary Theme="Dark" />
                 <ui:ControlsDictionary />
-                <!-- App colours; ThemeService swaps this for LightTheme.xaml -->
                 <ResourceDictionary Source="Resources/Themes/DarkTheme.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="TextBlock">

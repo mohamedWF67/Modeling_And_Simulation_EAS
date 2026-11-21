@@ -1,5 +1,4 @@
-﻿using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using Modeling_And_Simulation_EAS.Pages;
 using Modeling_And_Simulation_EAS.ViewModels;
 
