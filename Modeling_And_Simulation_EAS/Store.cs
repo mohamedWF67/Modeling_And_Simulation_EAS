@@ -43,10 +43,9 @@ public class Store
     public Store(string name, ulong seed)
     {
         this.name = name;
-        var master = new LCG(seed);
-        _demandARng = new LCG(NextSeed(master));
-        _demandBRng = new LCG(NextSeed(master));
-        _leadTimeRng = new LCG(NextSeed(master));
+        _demandARng = new LCG(DeriveSeed(seed, 1));
+        _demandBRng = new LCG(DeriveSeed(seed, 2));
+        _leadTimeRng = new LCG(DeriveSeed(seed, 3));
     }
     
     public void SetDistributionTables(DiscreteDistribution DemandA, DiscreteDistribution DemandB,
@@ -234,6 +233,12 @@ public class Store
     /// <summary>Random number from 1 to 100, used with the RN ranges of the tables.</summary>
     private static int NextRn(LCG rng) => rng.NextInt(1, 100);
 
-    /// <summary>A new seed between 1 and 2³¹ − 2 taken from the master generator (never 0).</summary>
-    private static ulong NextSeed(LCG master) => (ulong)master.NextInt(1, int.MaxValue - 1);
+    private static ulong DeriveSeed(ulong seed, ulong stream)
+    {
+        ulong z = seed + stream * 0x9E3779B97F4A7C15UL;
+        z = (z ^ (z >> 30)) * 0xBF58476D1CE4E5B9UL;
+        z = (z ^ (z >> 27)) * 0x94D049BB133111EBUL;
+        z ^= z >> 31;
+        return z % 2147483646UL + 1;   // between 1 and 2³¹ − 2, never 0
+    }
 }

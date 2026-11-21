@@ -3,10 +3,223 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Modeling_And_Simulation_EAS.Pages"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:vm="clr-namespace:Modeling_And_Simulation_EAS.ViewModels"
+      xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
       mc:Ignorable="d"
+      d:DesignHeight="700"
+      d:DesignWidth="900"
+      d:DataContext="{d:DesignInstance vm:SimulationViewModel}"
+      ScrollViewer.CanContentScroll="False"
       Title="Simulation table">
+    <!-- CanContentScroll="False" turns off the NavigationView's page scroll viewer:
+         the table fills the page and scrolls by itself (only visible rows are drawn). -->
+    <Page.Resources>
+        <Style x:Key="SimulationGrid" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
+            <Setter Property="ItemsSource" Value="{Binding DayRows}" />
+            <Setter Property="AutoGenerateColumns" Value="False" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="CanUserAddRows" Value="False" />
+            <Setter Property="CanUserDeleteRows" Value="False" />
+            <Setter Property="AlternatingRowBackground" Value="#484848"/>
+            <Setter Property="CanUserReorderColumns" Value="False" />
+            <Setter Property="CanUserResizeRows" Value="False" />
+            <Setter Property="HeadersVisibility" Value="Column" />
+            <Setter Property="SelectionMode" Value="Single" />
+            <!-- Day and cycle stay visible while scrolling sideways -->
+            <Setter Property="FrozenColumnCount" Value="2" />
+            <Setter Property="EnableRowVirtualization" Value="True" />
+            <Setter Property="EnableColumnVirtualization" Value="True" />
+            <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True" />
+            <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+            <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+            <Setter Property="FontSize" Value="13" />
+        </Style>
+
+        <!-- Lost sales in red -->
+        <Style x:Key="LostAText" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StockoutA}" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="LostBText" TargetType="TextBlock" BasedOn="{StaticResource LostAText}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding StockoutB}" Value="True">
+                    <Setter Property="Foreground" Value="{DynamicResource SystemFillColorCriticalBrush}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <!-- Delivered units in green -->
+        <Style x:Key="ReceivedText" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <DataTemplate x:Key="CombinedTable">
+            <DataGrid Style="{StaticResource SimulationGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Day" Binding="{Binding Day}"/>
+                    <DataGridTextColumn Header="Cycle" Binding="{Binding Cycle}"/>
+                    <DataGridTextColumn Header="A&#10;recv" Binding="{Binding ReceivedA, TargetNullValue=—}" ElementStyle="{StaticResource ReceivedText}"/>
+                    <DataGridTextColumn Header="A&#10;begin" Binding="{Binding BeginA}"/>
+                    <DataGridTextColumn Header="A&#10;RN" Binding="{Binding RnA}"/>
+                    <DataGridTextColumn Header="A&#10;demand" Binding="{Binding DemandA}"/>
+                    <DataGridTextColumn Header="A&#10;sold" Binding="{Binding SoldA}"/>
+                    <DataGridTextColumn Header="A&#10;lost" Binding="{Binding LostA}" ElementStyle="{StaticResource LostAText}"/>
+                    <DataGridTextColumn Header="A&#10;end" Binding="{Binding EndA}"/>
+                    <DataGridTextColumn Header="B&#10;recv" Binding="{Binding ReceivedB, TargetNullValue=—}" ElementStyle="{StaticResource ReceivedText}"/>
+                    <DataGridTextColumn Header="B&#10;begin" Binding="{Binding BeginB}"/>
+                    <DataGridTextColumn Header="B&#10;RN" Binding="{Binding RnB}"/>
+                    <DataGridTextColumn Header="B&#10;demand" Binding="{Binding DemandB}"/>
+                    <DataGridTextColumn Header="B&#10;sold" Binding="{Binding SoldB}"/>
+                    <DataGridTextColumn Header="B&#10;lost" Binding="{Binding LostB}" ElementStyle="{StaticResource LostBText}"/>
+                    <DataGridTextColumn Header="B&#10;end" Binding="{Binding EndB}"/>
+                    <DataGridTextColumn Header="Space&#10;ft³" Binding="{Binding SpaceUsed}"/>
+                    <DataGridTextColumn Header="Profit&#10;LE" Binding="{Binding Profit}"/>
+                    <DataGridTextColumn Header="Lost&#10;profit" Binding="{Binding LostProfit}"/>
+                    <DataGridTextColumn Header="Order&#10;A" Binding="{Binding OrderA, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Order&#10;B" Binding="{Binding OrderB, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="RN&#10;LT" Binding="{Binding RnLeadTime, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Lead&#10;time" Binding="{Binding LeadTime, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Arrives&#10;day" Binding="{Binding ArrivalDay, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Days until&#10;arrival" Binding="{Binding DaysUntilArrival, TargetNullValue=—}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ProductATable">
+            <DataGrid Style="{StaticResource SimulationGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Day" Binding="{Binding Day}"/>
+                    <DataGridTextColumn Header="Cycle" Binding="{Binding Cycle}"/>
+                    <DataGridTextColumn Header="Received" Binding="{Binding ReceivedA, TargetNullValue=—}" ElementStyle="{StaticResource ReceivedText}"/>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding BeginA}"/>
+                    <DataGridTextColumn Header="RN" Binding="{Binding RnA}"/>
+                    <DataGridTextColumn Header="Demand" Binding="{Binding DemandA}"/>
+                    <DataGridTextColumn Header="Sold" Binding="{Binding SoldA}"/>
+                    <DataGridTextColumn Header="Lost" Binding="{Binding LostA}" ElementStyle="{StaticResource LostAText}"/>
+                    <DataGridTextColumn Header="End" Binding="{Binding EndA}"/>
+                    <DataGridTextColumn Header="Order" Binding="{Binding OrderA, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Days until&#10;arrival" Binding="{Binding DaysUntilArrival, TargetNullValue=—}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="ProductBTable">
+            <DataGrid Style="{StaticResource SimulationGrid}">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Day" Binding="{Binding Day}"/>
+                    <DataGridTextColumn Header="Cycle" Binding="{Binding Cycle}"/>
+                    <DataGridTextColumn Header="Received" Binding="{Binding ReceivedB, TargetNullValue=—}" ElementStyle="{StaticResource ReceivedText}"/>
+                    <DataGridTextColumn Header="Begin" Binding="{Binding BeginB}"/>
+                    <DataGridTextColumn Header="RN" Binding="{Binding RnB}"/>
+                    <DataGridTextColumn Header="Demand" Binding="{Binding DemandB}"/>
+                    <DataGridTextColumn Header="Sold" Binding="{Binding SoldB}"/>
+                    <DataGridTextColumn Header="Lost" Binding="{Binding LostB}" ElementStyle="{StaticResource LostBText}"/>
+                    <DataGridTextColumn Header="End" Binding="{Binding EndB}"/>
+                    <DataGridTextColumn Header="Order" Binding="{Binding OrderB, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Days until&#10;arrival" Binding="{Binding DaysUntilArrival, TargetNullValue=—}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="OrdersTable">
+            <!-- ItemsSource set here overrides the style's DayRows -->
+            <DataGrid Style="{StaticResource SimulationGrid}" ItemsSource="{Binding OrderRows}" FrozenColumnCount="1">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Order" Binding="{Binding Id}"/>
+                    <DataGridTextColumn Header="Placed&#10;(day)" Binding="{Binding PlacedOnDay}"/>
+                    <DataGridTextColumn Header="Qty A" Binding="{Binding QuantityA}"/>
+                    <DataGridTextColumn Header="Qty B" Binding="{Binding QuantityB}"/>
+                    <DataGridTextColumn Header="RN" Binding="{Binding Rn}"/>
+                    <DataGridTextColumn Header="Lead&#10;time" Binding="{Binding LeadTime}"/>
+                    <DataGridTextColumn Header="Arrives&#10;(day)" Binding="{Binding ArrivalDay}"/>
+                    <DataGridTextColumn Header="Kept A" Binding="{Binding ReceivedA, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Kept B" Binding="{Binding ReceivedB, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Returned A" Binding="{Binding ReturnedA, TargetNullValue=—}"/>
+                    <DataGridTextColumn Header="Returned B" Binding="{Binding ReturnedB, TargetNullValue=—}"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </DataTemplate>
+    </Page.Resources>
+
     <Grid>
-        
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="True">
+                        <Setter Property="Background" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0"
+                       Text="Simulation Table"
+                       FontWeight="SemiBold" FontSize="18"
+                       Margin="4,0,0,2"/>
+            <TextBlock Grid.Row="1"
+                       Text="{Binding Summary}"
+                       Opacity="0.65"
+                       TextWrapping="Wrap"
+                       Margin="4,0,0,12"/>
+
+            <ui:CardControl Grid.Row="2" Icon="{ui:SymbolIcon TableSimple20}" Margin="0,0,0,8">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock VerticalAlignment="Center" FontSize="14" TextWrapping="Wrap" Text="Table"/>
+                        <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap"
+                                   Text="Both products, one product, or the list of orders"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ComboBox Width="150" SelectedIndex="{Binding SelectedTableIndex, Mode=TwoWay}">
+                    <ComboBoxItem Content="Combined"/>
+                    <ComboBoxItem Content="Product A"/>
+                    <ComboBoxItem Content="Product B"/>
+                    <ComboBoxItem Content="Orders"/>
+                </ComboBox>
+            </ui:CardControl>
+
+            <ui:Card Grid.Row="3"
+                     Padding="4"
+                     VerticalAlignment="Stretch"
+                     VerticalContentAlignment="Stretch">
+                <ContentControl Content="{Binding}"
+                                Focusable="False"
+                                HorizontalContentAlignment="Stretch"
+                                VerticalContentAlignment="Stretch">
+                    <ContentControl.Style>
+                        <Style TargetType="ContentControl">
+                            <Setter Property="ContentTemplate" Value="{StaticResource CombinedTable}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedTableIndex}" Value="1">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ProductATable}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTableIndex}" Value="2">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource ProductBTable}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding SelectedTableIndex}" Value="3">
+                                    <Setter Property="ContentTemplate" Value="{StaticResource OrdersTable}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
+            </ui:Card>
+        </Grid>
     </Grid>
 </Page>

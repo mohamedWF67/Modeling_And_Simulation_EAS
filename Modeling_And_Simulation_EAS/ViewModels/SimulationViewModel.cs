@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Modeling_And_Simulation_EAS.Entities;
+using Modeling_And_Simulation_EAS.Random;
 using Modeling_And_Simulation_EAS.Simulation;
 using Wpf.Ui.Controls;
 
@@ -69,7 +70,44 @@ public partial class SimulationViewModel : ObservableObject
 
     public bool HasError => ErrorMessage != null;
     
+    private static readonly StoreParameters BriefDefaults = new();
+    [ObservableProperty]
+    private double? reviewPeriod = 4;
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SpaceNeeded), nameof(IsOverCapacity), nameof(SpaceWarning))]
+    private double? levelA = 160;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(SpaceNeeded), nameof(IsOverCapacity), nameof(SpaceWarning))]
+    private double? levelB = 40;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsOverCapacity), nameof(SpaceWarning))]
+    private double? capacity = 300;
+    public int SpaceNeeded => (int)((LevelA ?? 0) * BriefDefaults.SizeA + (LevelB ?? 0) * BriefDefaults.SizeB);
+    public bool IsOverCapacity => SpaceNeeded > (Capacity ?? 0);
+    public string SpaceWarning =>
+        $"mA·{BriefDefaults.SizeA} + mB·{BriefDefaults.SizeB} = {SpaceNeeded} ft³, but the store holds {Capacity ?? 0} ft³. " +
+        "Deliveries that don't fit will be cut down.";
+
+    // ---------------- Table of the last run ----------------
+
+    /// <summary>One row per day (Simulation table page).</summary>
+    [ObservableProperty]
+    private IReadOnlyList<DayRow> dayRows = [];
+
+    /// <summary>One row per order (Orders view).</summary>
+    [ObservableProperty]
+    private IReadOnlyList<OrderRow> orderRows = [];
+
+    /// <summary>Which table is shown: 0 combined, 1 product A, 2 product B, 3 orders.</summary>
+    [ObservableProperty]
+    private int selectedTableIndex;
+
+    [ObservableProperty]
+    private IReadOnlyList<RunResult> runResults = [];
+    
     // ---------------- Commands ----------------
 
     /// <summary>
@@ -89,11 +127,32 @@ public partial class SimulationViewModel : ObservableObject
             DiscreteDistribution demandb = DemandB.Build();
             DiscreteDistribution lead = LeadTime.Build();
             
-            var store = new Store(StoreName, (ulong)seedValue);
-            store.SetDistributionTables(demanda, demandb, lead);
-            RunResult result = store.Run(new StoreParameters(Days: count));
-            Summary = $"Profit/day {result.AverageDailyProfit:0.0} LE, end A {result.AverageEndA:0.0}, " +
-                      $"end B {result.AverageEndB:0.0}, orders {result.OrderCount}, trimmed {result.TrimmedDeliveries}";
+            var parameters = new StoreParameters(
+                Days: count,
+                ReviewPeriod: ReadWholeNumber(ReviewPeriod, "Review period N", 1, 30),
+                LevelA: ReadWholeNumber(LevelA, "mA", 0, 10_000),
+                LevelB: ReadWholeNumber(LevelB, "mB", 0, 10_000),
+                Capacity: ReadWholeNumber(Capacity, "Capacity", 1, 100_000));
+
+            var results = new List<RunResult>();
+            Store? firstRun = null;
+
+            for (int r = 0; r < reps; r++)
+            {
+                var store = new Store(StoreName, (ulong)seedValue + (ulong)r);
+                store.SetDistributionTables(demanda, demandb, lead);
+                store.KeepTable = r == 0;              // only run 1 is shown in the table
+                results.Add(store.Run(parameters));
+                firstRun ??= store;
+            }
+
+            RunResults = results;
+            DayRows = firstRun!.Days.Select(DayRow.From).ToList();
+            OrderRows = firstRun.Orders.Select(OrderRow.From).ToList();
+
+            RunResult first = results[0];
+            Summary = $"Profit/day {first.AverageDailyProfit:0.0} LE, end A {first.AverageEndA:0.0}, " +
+                      $"end B {first.AverageEndB:0.0}, orders {first.OrderCount}, trimmed {first.TrimmedDeliveries}";
             ErrorMessage = null;
         }
         catch (ArgumentException ex)

@@ -121,7 +121,54 @@
                        Opacity="0.65"
                        TextWrapping="Wrap"
                        Margin="4,0,0,12"/>
-
+                        <TextBlock Text="Policy" FontWeight="SemiBold" FontSize="14" Margin="4,4,0,4"/>
+            <ui:CardControl Icon="{ui:SymbolIcon ArrowRepeatAll20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="Review period (N)"/>
+                        <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="Days between two stock reviews"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150" Minimum="1" Maximum="30" MaxDecimalPlaces="0"
+                              Value="{Binding ReviewPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <ui:CardControl Icon="{ui:SymbolIcon Box20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="Order-up-to level of A (mA)"/>
+                        <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="At a review, A is ordered up to this many units (1 ft³ each)"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150" Minimum="0" Maximum="300" MaxDecimalPlaces="0"
+                              Value="{Binding LevelA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <ui:CardControl Icon="{ui:SymbolIcon BoxMultiple20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="Order-up-to level of B (mB)"/>
+                        <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="At a review, B is ordered up to this many units (4 ft³ each)"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150" Minimum="0" Maximum="75" MaxDecimalPlaces="0"
+                              Value="{Binding LevelB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <ui:CardControl Icon="{ui:SymbolIcon Cube20}">
+                <ui:CardControl.Header>
+                    <StackPanel>
+                        <TextBlock FontSize="14" Text="Store capacity"/>
+                        <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="Space for both products, in ft³"/>
+                    </StackPanel>
+                </ui:CardControl.Header>
+                <ui:NumberBox Width="150" Minimum="1" Maximum="100000" MaxDecimalPlaces="0"
+                              Value="{Binding Capacity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </ui:CardControl>
+            <ui:InfoBar Title="The levels don't fit in the store"
+                        Message="{Binding SpaceWarning}"
+                        IsOpen="{Binding IsOverCapacity, Mode=OneWay}"
+                        IsClosable="False"
+                        Severity="Warning"
+                        Margin="0,4,0,8"/>
+            <TextBlock Text="Run" FontWeight="SemiBold" FontSize="14" Margin="4,4,0,4"/>
             <ui:CardControl Icon="{ui:SymbolIcon People20}">
                 <ui:CardControl.Header>
                     <StackPanel>
