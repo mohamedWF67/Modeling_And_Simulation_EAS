@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Modeling_And_Simulation_EAS.Entities;
+using Modeling_And_Simulation_EAS.Simulation;
 using Wpf.Ui.Controls;
 
 namespace Modeling_And_Simulation_EAS.ViewModels;
@@ -88,7 +89,12 @@ public partial class SimulationViewModel : ObservableObject
             DiscreteDistribution demandb = DemandB.Build();
             DiscreteDistribution lead = LeadTime.Build();
             
-            List<Store> runs = new();
+            var store = new Store(StoreName, (ulong)seedValue);
+            store.SetDistributionTables(demanda, demandb, lead);
+            RunResult result = store.Run(new StoreParameters(Days: count));
+            Summary = $"Profit/day {result.AverageDailyProfit:0.0} LE, end A {result.AverageEndA:0.0}, " +
+                      $"end B {result.AverageEndB:0.0}, orders {result.OrderCount}, trimmed {result.TrimmedDeliveries}";
+            ErrorMessage = null;
         }
         catch (ArgumentException ex)
         {
