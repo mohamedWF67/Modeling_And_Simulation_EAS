@@ -1,10 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Modeling_And_Simulation_EAS;
 using Modeling_And_Simulation_EAS.Entities;
-using Modeling_and_Simulation_EAS.ViewModels;
 using Wpf.Ui.Controls;
 
+namespace Modeling_And_Simulation_EAS.ViewModels;
 
 /// <summary>
 /// Shared state of the window: the distribution tables, the inputs of a run and the results
@@ -25,11 +24,11 @@ public partial class SimulationViewModel : ObservableObject
     private SimulationViewModel()
     {
         DemandA = new DistributionTableViewModel(
-            "DemandA", "Which kind of patient arrives", SymbolRegular.People20);
+            "DemandA", "Units of A sold per day", SymbolRegular.People20);
         DemandB = new DistributionTableViewModel(
-            "DemandB", "Minutes between two arrivals", SymbolRegular.PersonClock20);
+            "DemandB", "Units of B sold per day", SymbolRegular.PersonClock20);
         LeadTime = new DistributionTableViewModel(
-            "LeadTime", "Minutes with the doctor", SymbolRegular.Stethoscope20);
+            "LeadTime", "Days until an order arrives", SymbolRegular.Stethoscope20);
 
         Distributions = [DemandA, DemandB, LeadTime];
 
@@ -58,14 +57,6 @@ public partial class SimulationViewModel : ObservableObject
 
     // ---------------- Results of the last run ----------------
 
-    /// <summary>One row per patient (shown on the Simulation table page).</summary>
-    [ObservableProperty]
-    private IReadOnlyList<PatientRow> patients = [];
-
-    /// <summary>Every event in the order it happened (shown on the right of the window).</summary>
-    [ObservableProperty]
-    private IReadOnlyList<CalendarRow> calendar = [];
-
     /// <summary>One line describing the last run.</summary>
     [ObservableProperty]
     private string summary = "";
@@ -76,10 +67,7 @@ public partial class SimulationViewModel : ObservableObject
     private string? errorMessage;
 
     public bool HasError => ErrorMessage != null;
-
-    /// <summary>Which table the Simulation table page shows: 0 combined, 1 nurse, 2 doctors.</summary>
-    [ObservableProperty]
-    private int selectedTableIndex;
+    
 
     // ---------------- Commands ----------------
 
@@ -92,7 +80,7 @@ public partial class SimulationViewModel : ObservableObject
     {
         try
         {
-            int count = ReadWholeNumber(days, "Patients", 1, MaxDays);
+            int count = ReadWholeNumber(Days, "Days", 1, MaxDays);
             int seedValue = ReadWholeNumber(Seed, "Seed", 1, int.MaxValue - MaxReplications);
             int reps = ReadWholeNumber(Replications, "Replications", 1, MaxReplications); 
             // ... build the four distributions as before ...

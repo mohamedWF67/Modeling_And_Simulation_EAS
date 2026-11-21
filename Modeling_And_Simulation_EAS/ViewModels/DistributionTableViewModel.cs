@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Modeling_And_Simulation_EAS.Entities;
 using Wpf.Ui.Controls;
 
-namespace Modeling_and_Simulation_EAS.ViewModels;
+namespace Modeling_And_Simulation_EAS.ViewModels;
 
 /// <summary>
 /// One distribution table on the Distribution page: value, probability, cumulative probability
