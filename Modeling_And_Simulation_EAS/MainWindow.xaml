@@ -1,12 +1,166 @@
-﻿<Window x:Class="Modeling_And_Simulation_EAS.MainWindow"
+﻿<ui:FluentWindow x:Class="Modeling_And_Simulation_EAS.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Modeling_And_Simulation_EAS"
+        xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+        xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
+        xmlns:pages="clr-namespace:Modeling_And_Simulation_EAS.Pages"
+        xmlns:vm="clr-namespace:Modeling_And_Simulation_EAS.ViewModels"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        d:DataContext="{d:DesignInstance vm:SimulationViewModel}"
+        Title="El Shazly Store Simulation"
+        Height="820"
+        Width="1440"
+        MinHeight="560"
+        MinWidth="980"
+        WindowStartupLocation="CenterScreen">
 
+    <Grid Background="{DynamicResource TitleBarBackgroundBrush}">
+        <Grid.Style>
+            <Style TargetType="Grid">
+                <Style.Triggers>
+                    <Trigger Property="componentModel:DesignerProperties.IsInDesignMode" Value="True">
+                        <Setter Property="Background" Value="Black"/>
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </Grid.Style>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Bar -->
+        <Grid Grid.Row="0" Background="{DynamicResource TitleBarBackgroundBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="40"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left buttons -->
+            <ui:Button Grid.Column="0"
+                       Width="40"
+                       Height="40"
+                       Margin="4"
+                       Background="Transparent"
+                       BorderBrush="Transparent"
+                       ToolTip="Back"
+                       Click="BackButton_Click">
+                <ui:SymbolIcon Symbol="ArrowLeft20"/>
+            </ui:Button>
+            <ui:Button Grid.Column="1"
+                       Width="40"
+                       Height="40"
+                       Margin="0,4"
+                       Background="Transparent"
+                       BorderBrush="Transparent"
+                       ToolTip="Show or hide the menu"
+                       Click="PanelButton_Click">
+                <ui:SymbolIcon Symbol="Navigation20"/>
+            </ui:Button>
+
+            <!-- TitleBar -->
+            <ui:TitleBar Grid.Column="2"
+                         ShowMinimize="False"
+                         ShowMaximize="False"
+                         ShowClose="False"
+                         Height="48">
+                <ui:TitleBar.Icon>
+                    <ui:SymbolIcon Symbol="ClothesHanger24"
+                                   Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"/>
+                </ui:TitleBar.Icon>
+                <ui:TitleBar.Header>
+                    <TextBlock Margin="0,0,0,0" VerticalAlignment="Center" FontWeight="SemiBold" Text="El Shazly Store Simulation"/>
+                </ui:TitleBar.Header>
+                <ui:TitleBar.TrailingContent>
+                    <StackPanel Orientation="Horizontal">
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   Foreground="White"
+                                   ToolTip="Minimize"
+                                   Click="Minimize_OnClick">
+                            <ui:SymbolIcon Symbol="Line48" RenderTransformOrigin="0.5,0.5">
+                                <ui:SymbolIcon.RenderTransform>
+                                    <RotateTransform Angle="45"/>
+                                </ui:SymbolIcon.RenderTransform>
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   Foreground="White"
+                                   ToolTip="Maximize"
+                                   Click="Maximize_OnClick">
+                            <ui:SymbolIcon Symbol="Maximize48" RenderTransformOrigin="0.5,0.5">
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                        <ui:Button Width="40"
+                                   Height="40"
+                                   Margin="0,0,4,0"
+                                   Background="Transparent"
+                                   BorderBrush="Transparent"
+                                   MouseOverBackground="{ui:ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                                   Foreground="White"
+                                   ToolTip="Close"
+                                   Click="CloseBtn_OnClick">
+                            <ui:SymbolIcon Symbol="Add48" RenderTransformOrigin="0.5,0.5">
+                                <ui:SymbolIcon.RenderTransform>
+                                    <RotateTransform Angle="45"/>
+                                </ui:SymbolIcon.RenderTransform>
+                            </ui:SymbolIcon>
+                        </ui:Button>
+                    </StackPanel>
+                </ui:TitleBar.TrailingContent>
+            </ui:TitleBar>
+        </Grid>
+                    <ui:NavigationView IsBackButtonVisible="Collapsed"
+                               VerticalContentAlignment="Stretch"
+                               HorizontalContentAlignment="Stretch"
+                               IsTopSeparatorVisible="False"
+                               IsFooterSeparatorVisible="False"
+                               IsPaneOpen="False"
+                               IsPaneToggleVisible="False"
+                               AlwaysShowHeader="True"
+                               OpenPaneLength="180"
+                               ScrollViewer.PanningMode="VerticalFirst"
+                               ScrollViewer.PanningRatio="1"
+                               ScrollViewer.VerticalScrollBarVisibility="Auto"
+                               Background="{DynamicResource TitleBarBackgroundBrush}"
+                               Name="NavigationView"
+                               Grid.Row="1">
+                <!-- NavigationCacheMode="Enabled": each page is built once and reused,
+                     so going back to a table does not rebuild it -->
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem
+                        Content="Distribution"
+                        ToolTip="Distribution"
+                        Icon="{ui:SymbolIcon DataHistogram20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:DistributedPage}" />
+
+                    <ui:NavigationViewItemSeparator/>
+
+                    <ui:NavigationViewItem
+                        Content="Simulation table"
+                        ToolTip="Simulation table"
+                        Icon="{ui:SymbolIcon TableSimple20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:SimulationTablePage}" />
+                    
+                    <ui:NavigationViewItem
+                        Content="Results"
+                        ToolTip="Results"
+                        Icon="{ui:SymbolIcon DataUsage20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:ResultsPage}" />
+                </ui:NavigationView.MenuItems>
+            </ui:NavigationView>
     </Grid>
-</Window>
+</ui:FluentWindow>
