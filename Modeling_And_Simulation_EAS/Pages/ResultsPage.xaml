@@ -1,12 +1,191 @@
 ﻿<Page x:Class="Modeling_And_Simulation_EAS.Pages.ResultsPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Modeling_And_Simulation_EAS.Pages"
-      mc:Ignorable="d"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       Title="Results">
-    <Grid>
-        
-    </Grid>
+    <Page.Resources>
+        <Style x:Key="Big" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="30"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="Small" TargetType="TextBlock">
+            <Setter Property="Opacity" Value="0.65"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="QuestionTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="4,12,0,4"/>
+        </Style>
+    </Page.Resources>
+
+    <StackPanel Margin="16">
+        <TextBlock Text="Results" FontWeight="SemiBold" FontSize="24" Margin="4,0,0,2"/>
+        <TextBlock Opacity="0.65" Margin="4,0,0,8">
+            <Run Text="Average of"/> <Run Text="{Binding RunCount, Mode=OneWay}"/>
+            <Run Text="runs ×"/> <Run Text="{Binding Days, Mode=OneWay}"/> <Run Text="days"/>
+        </TextBlock>
+
+        <TextBlock Text="Q1 – Average ending stock" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <Grid ColumnDefinitions="*,*">
+                    <StackPanel>
+                        <TextBlock Text="Product A (units)" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding EndA}" Style="{StaticResource Big}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Product B (units)" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding EndB}" Style="{StaticResource Big}"/>
+                    </StackPanel>
+                </Grid>
+                <lvc:CartesianChart Height="240" Background="Transparent" LegendPosition="Hidden">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q1Values}" SeriesName="Ending stock"
+                                                  ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q1Labels}" LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis MinLimit="0" AxisName="Units"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+            </StackPanel>
+        </ui:Card>
+
+        <TextBlock Text="Q2 – Average net profit" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <Grid ColumnDefinitions="*,*,*,*">
+                    <StackPanel>
+                        <TextBlock Text="Per day (LE)" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding ProfitPerDay}" Style="{StaticResource Big}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Per review cycle (LE)" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding ProfitPerCycle}" Style="{StaticResource Big}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="Of the ceiling" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding ShareOfCeiling, StringFormat=0.0%}" Style="{StaticResource Big}"/>
+                        <TextBlock Text="{Binding Ceiling, StringFormat='ceiling {0:0} LE/day'}" Style="{StaticResource Small}"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3">
+                        <TextBlock Text="Lost per day (LE)" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding LostProfitPerDay}" Style="{StaticResource Big}"/>
+                    </StackPanel>
+                </Grid>
+                <lvc:CartesianChart Height="260" Background="Transparent" LegendPosition="Hidden">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q2Values}" SeriesName="Profit per day"/>
+                            <lvc:XamlLineSeries Values="{Binding Q2Ceiling}" SeriesName="Ceiling" GeometrySize="0" Fill="{x:Null}"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q2Labels}" AxisName="Run"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis AxisName="LE per day"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+            </StackPanel>
+        </ui:Card>
+
+        <TextBlock Text="Q3 – Theoretical vs simulated mean demand" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <Grid ColumnDefinitions="*,*">
+                    <StackPanel>
+                        <TextBlock Text="Demand A" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding DemandA}" Style="{StaticResource Big}"/>
+                        <TextBlock Style="{StaticResource Small}">
+                            <Run Text="theory"/> <Run Text="{Binding TheoryDemandA, Mode=OneWay}"/>
+                            <Run Text="· error"/> <Run Text="{Binding ErrorDemandA, Mode=OneWay}"/><Run Text="%"/>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Demand B" Style="{StaticResource Label}"/>
+                        <TextBlock Text="{Binding DemandB}" Style="{StaticResource Big}"/>
+                        <TextBlock Style="{StaticResource Small}">
+                            <Run Text="theory"/> <Run Text="{Binding TheoryDemandB, Mode=OneWay}"/>
+                            <Run Text="· error"/> <Run Text="{Binding ErrorDemandB, Mode=OneWay}"/><Run Text="%"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+                <lvc:CartesianChart Height="240" Background="Transparent" LegendPosition="Bottom"
+                                    LegendTextPaint="{lvc:SolidColorPaint Color='#FFFFFF'}">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q3Theory}" SeriesName="Theoretical"
+                                                  ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                            <lvc:XamlColumnSeries Values="{Binding Q3Simulated}" SeriesName="Simulated"
+                                                  ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q3Labels}" LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis MinLimit="0" AxisName="Units per day"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+            </StackPanel>
+        </ui:Card>
+
+        <TextBlock Text="Q4 – Theoretical vs simulated mean lead time" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <TextBlock Text="Lead time (days)" Style="{StaticResource Label}"/>
+                <TextBlock Text="{Binding LeadTime}" Style="{StaticResource Big}"/>
+                <TextBlock Style="{StaticResource Small}">
+                    <Run Text="theory"/> <Run Text="{Binding TheoryLeadTime, Mode=OneWay}"/>
+                    <Run Text="· error"/> <Run Text="{Binding ErrorLeadTime, Mode=OneWay}"/><Run Text="%"/>
+                </TextBlock>
+                <lvc:CartesianChart Height="220" Background="Transparent" LegendPosition="Hidden">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q4Values}" SeriesName="Lead time"
+                                                  ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q4Labels}" LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis MinLimit="0" AxisName="Days"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+            </StackPanel>
+        </ui:Card>
+    </StackPanel>
 </Page>

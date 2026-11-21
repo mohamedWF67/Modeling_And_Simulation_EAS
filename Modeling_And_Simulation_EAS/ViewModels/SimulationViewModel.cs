@@ -154,6 +154,9 @@ public partial class SimulationViewModel : ObservableObject
             Summary = $"Profit/day {first.AverageDailyProfit:0.0} LE, end A {first.AverageEndA:0.0}, " +
                       $"end B {first.AverageEndB:0.0}, orders {first.OrderCount}, trimmed {first.TrimmedDeliveries}";
             ErrorMessage = null;
+            
+            ResultsViewModel.Instance.ConnectRuns(new SimulationRun(results, parameters,
+                demanda.TheoreticalMean, demandb.TheoreticalMean, lead.TheoreticalMean));
         }
         catch (ArgumentException ex)
         {
