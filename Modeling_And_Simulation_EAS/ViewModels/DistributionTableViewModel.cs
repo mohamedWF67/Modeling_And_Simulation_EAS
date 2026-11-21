@@ -19,7 +19,7 @@ public partial class DistributionTableViewModel : ObservableObject
     /// <param name="description">One line saying what the value means.</param>
     /// <param name="icon">Icon shown next to the title.</param>
     /// <param name="formatValue">How a value is shown in the table (default: the number).</param>
-    /// <param name="showsMean">False when the mean has no meaning (patient type).</param>
+    /// <param name="showsMean">False when the mean has no meaning for this table.</param>
     public DistributionTableViewModel(string title, string description, SymbolRegular icon,
         Func<int, string>? formatValue = null, bool showsMean = true)
     {
@@ -125,7 +125,7 @@ public partial class DistributionRowViewModel : ObservableObject
 
     public int Value { get; }
 
-    /// <summary>The value as shown in the table ("Elderly" for the patient type, minutes otherwise).</summary>
+    /// <summary>The value as shown in the table (units for demand, days for lead time).</summary>
     public string Label { get; }
 
     [ObservableProperty]

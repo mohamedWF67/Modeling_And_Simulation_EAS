@@ -7,7 +7,7 @@ namespace Modeling_And_Simulation_EAS.ViewModels;
 
 /// <summary>
 /// Shared state of the window: the distribution tables, the inputs of a run and the results
-/// of the last run (simulation table and event calendar). Every page binds to <see cref="Instance"/>.
+/// of the last run (simulation table and results). Every page binds to <see cref="Instance"/>.
 /// </summary>
 public partial class SimulationViewModel : ObservableObject
 {
@@ -24,11 +24,11 @@ public partial class SimulationViewModel : ObservableObject
     private SimulationViewModel()
     {
         DemandA = new DistributionTableViewModel(
-            "DemandA", "Units of A sold per day", SymbolRegular.People20);
+            "Demand A", "Units of A sold per day", SymbolRegular.Box20);
         DemandB = new DistributionTableViewModel(
-            "DemandB", "Units of B sold per day", SymbolRegular.PersonClock20);
+            "Demand B", "Units of B sold per day", SymbolRegular.BoxMultiple20);
         LeadTime = new DistributionTableViewModel(
-            "LeadTime", "Days until an order arrives", SymbolRegular.Stethoscope20);
+            "Lead time", "Days until an order arrives", SymbolRegular.Clock20);
 
         Distributions = [DemandA, DemandB, LeadTime];
 
@@ -42,12 +42,12 @@ public partial class SimulationViewModel : ObservableObject
     public DistributionTableViewModel DemandB { get; private set; }
     public DistributionTableViewModel LeadTime { get; private set; }
 
-    /// <summary>The four tables in the order they are shown.</summary>
+    /// <summary>The three tables in the order they are shown.</summary>
     public IReadOnlyList<DistributionTableViewModel> Distributions { get; }
 
     // ---------------- Inputs ----------------
 
-    /// <summary>Number of patients to simulate (NumberBox values are doubles).</summary>
+    /// <summary>Number of days to simulate in one run (NumberBox values are doubles).</summary>
     [ObservableProperty]
     private double? days = 100;
 
@@ -73,7 +73,7 @@ public partial class SimulationViewModel : ObservableObject
 
     /// <summary>
     /// Builds the distribution tables from the probabilities (cumulative column and RN ranges),
-    /// then simulates the patients and refreshes the simulation table and the event calendar.
+    /// then simulates the store day by day and refreshes the simulation table and the results.
     /// </summary>
     [RelayCommand]
     private void Compute()
@@ -83,14 +83,12 @@ public partial class SimulationViewModel : ObservableObject
             int count = ReadWholeNumber(Days, "Days", 1, MaxDays);
             int seedValue = ReadWholeNumber(Seed, "Seed", 1, int.MaxValue - MaxReplications);
             int reps = ReadWholeNumber(Replications, "Replications", 1, MaxReplications); 
-            // ... build the four distributions as before ...
 
             DiscreteDistribution demanda = DemandA.Build();
             DiscreteDistribution demandb = DemandB.Build();
             DiscreteDistribution lead = LeadTime.Build();
             
             List<Store> runs = new();
-            Console.Write($"Seed value ({reps}): ");
         }
         catch (ArgumentException ex)
         {
@@ -108,7 +106,7 @@ public partial class SimulationViewModel : ObservableObject
 
     // ---------------- Helpers ----------------
 
-    /// <summary>Loads the tables from Clinic.BuildDistributionTable.</summary>
+    /// <summary>Loads the tables from Store.BuildDistributionTable.</summary>
     private void LoadDefaultDistributions()
     {
         var defaults = new Store(StoreName);
