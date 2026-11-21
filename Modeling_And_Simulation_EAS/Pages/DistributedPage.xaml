@@ -96,7 +96,7 @@
                                    FontSize="12"
                                    Opacity="0.8"
                                    Visibility="{Binding ShowsMean, Converter={StaticResource BoolToVisibility}}"
-                                   Text="{Binding Mean, StringFormat='Theoretical mean {0:0.##} min'}"/>
+                                   Text="{Binding Mean, StringFormat='Theoretical mean {0:0.##}'}"/>
                     </Grid>
                 </Grid>
             </ui:Card>

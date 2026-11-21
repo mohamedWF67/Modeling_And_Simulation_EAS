@@ -5,16 +5,23 @@ using Modeling_And_Simulation_EAS.ViewModels;
 
 namespace Modeling_And_Simulation_EAS.Pages;
 
+/// <summary>
+/// Default page: the run inputs (days, seed, runs) and the three distribution tables
+/// (demand A, demand B, lead time) used to compute a run.
+/// </summary>
 public partial class DistributedPage : Page
 {
+    /// <summary>Below this width the tables are stacked in one column.</summary>
     private const double TwoColumnMinWidth = 820;
 
+    /// <summary>Builds the page and binds it to the shared view model.</summary>
     public DistributedPage()
     {
         InitializeComponent();
         DataContext = SimulationViewModel.Instance;
     }
 
+    /// <summary>Shows the tables in two columns when the page is wide enough, otherwise in one.</summary>
     private void TablesGrid_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         TablesGrid.Columns = e.NewSize.Width >= TwoColumnMinWidth ? 2 : 1;
@@ -30,6 +37,7 @@ public partial class DistributedPage : Page
             grid.CommitEdit(DataGridEditingUnit.Row, exitEditingMode: true);
     }
 
+    /// <summary>Finds every child control of type T inside the given control (searches the whole visual tree).</summary>
     private static IEnumerable<T> FindChildren<T>(DependencyObject parent) where T : DependencyObject
     {
         for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)

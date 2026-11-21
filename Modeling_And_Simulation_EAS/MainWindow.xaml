@@ -160,6 +160,13 @@
                         Icon="{ui:SymbolIcon DataUsage20}"
                         NavigationCacheMode="Enabled"
                         TargetPageType="{x:Type pages:ResultsPage}" />
+
+                    <ui:NavigationViewItem
+                        Content="Optimization"
+                        ToolTip="Optimization"
+                        Icon="{ui:SymbolIcon Search20}"
+                        NavigationCacheMode="Enabled"
+                        TargetPageType="{x:Type pages:OptimizationPage}" />
                 </ui:NavigationView.MenuItems>
             </ui:NavigationView>
     </Grid>
