@@ -1,12 +1,155 @@
-﻿<Page x:Class="Modeling_And_Simulation_EAS.Pages.OptimizationPage"
+<Page x:Class="Modeling_And_Simulation_EAS.Pages.OptimizationPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:local="clr-namespace:Modeling_And_Simulation_EAS.Pages"
-      mc:Ignorable="d"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+      xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
       Title="Optimization">
-    <Grid>
-        
-    </Grid>
+    <Page.Resources>
+        <Style x:Key="QuestionTitle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="4,12,0,4"/>
+        </Style>
+        <Style x:Key="BestText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemFillColorSuccessBrush}"/>
+        </Style>
+        <Style x:Key="PolicyGrid" TargetType="{x:Type DataGrid}" BasedOn="{StaticResource {x:Type DataGrid}}">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="AlternatingRowBackground" Value="#484848"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="0,8,0,0"/>
+            <Setter Property="MaxHeight" Value="360"/>
+        </Style>
+    </Page.Resources>
+
+    <StackPanel Margin="16">
+        <TextBlock Text="Optimization" FontWeight="SemiBold" FontSize="24" Margin="4,0,0,2"/>
+        <TextBlock Text="{Binding Status}" Opacity="0.65" TextWrapping="Wrap" Margin="4,0,0,8"/>
+        <ProgressBar Value="{Binding Progress}" Maximum="100" Height="4" Margin="0,0,0,8"/>
+
+        <ui:CardControl Icon="{ui:SymbolIcon ArrowRepeatAll20}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Largest N to try (Q5)"/>
+                    <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="Tries N = 1, 2, … up to this value with the current mA and mB"/>
+                </StackPanel>
+            </ui:CardControl.Header>
+            <ui:NumberBox Width="150" Minimum="1" Maximum="30" MaxDecimalPlaces="0"
+                          Value="{Binding MaxReviewPeriod, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </ui:CardControl>
+        <ui:CardControl Icon="{ui:SymbolIcon Box20}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Step for mA (Q6)"/>
+                    <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="mA = 0, step, 2·step, … (the largest mA that fits is always tried)"/>
+                </StackPanel>
+            </ui:CardControl.Header>
+            <ui:NumberBox Width="150" Minimum="1" Maximum="100" MaxDecimalPlaces="0"
+                          Value="{Binding StepA, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </ui:CardControl>
+        <ui:CardControl Icon="{ui:SymbolIcon BoxMultiple20}">
+            <ui:CardControl.Header>
+                <StackPanel>
+                    <TextBlock FontSize="14" Text="Step for mB (Q6)"/>
+                    <TextBlock FontSize="12" Opacity="0.5" TextWrapping="Wrap" Text="mB = 0, step, 2·step, … as long as mA + 4·mB fits in the store"/>
+                </StackPanel>
+            </ui:CardControl.Header>
+            <ui:NumberBox Width="150" Minimum="1" Maximum="25" MaxDecimalPlaces="0"
+                          Value="{Binding StepB, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+        </ui:CardControl>
+
+        <TextBlock Text="Q5 – Is there a better review period N?" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBlock Text="{Binding Q5Best}" Style="{StaticResource BestText}"/>
+                    <ui:Button Grid.Column="1" Content="Use this N" Icon="{ui:SymbolIcon Checkmark20}"
+                               Command="{Binding UseBestReviewPeriodCommand}" Margin="8,0,0,0"/>
+                    <ui:Button Grid.Column="2" Content="Try N" Icon="{ui:SymbolIcon Play20}" Appearance="Primary"
+                               Command="{Binding SweepReviewPeriodCommand}" Margin="8,0,0,0"/>
+                </Grid>
+                <lvc:CartesianChart Height="260" Background="Transparent" LegendPosition="Hidden">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q5Diff}" SeriesName="Difference"
+                                                  ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q5Labels}" AxisName="Review period N"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis AxisName="Profit per day vs current N (LE)"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+                <DataGrid ItemsSource="{Binding Q5Rows}" Style="{StaticResource PolicyGrid}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="N" Binding="{Binding ReviewPeriod}"/>
+                        <DataGridTextColumn Header="Profit / day" Binding="{Binding ProfitPerDay, StringFormat=0.00}"/>
+                        <DataGridTextColumn Header="vs current" Binding="{Binding DiffVsCurrent, StringFormat='+0.00;-0.00;0.00'}"/>
+                        <DataGridTextColumn Header="Lost profit / day" Binding="{Binding LostProfitPerDay, StringFormat=0.00}"/>
+                        <DataGridTextColumn Header="Trimmed deliveries / run" Binding="{Binding TrimmedPerRun, StringFormat=0.0}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ui:Card>
+
+        <TextBlock Text="Q6 – Are there better values for mA and mB?" Style="{StaticResource QuestionTitle}"/>
+        <ui:Card>
+            <StackPanel>
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBlock Text="{Binding Q6Best}" Style="{StaticResource BestText}"/>
+                    <ui:Button Grid.Column="1" Content="Use these levels" Icon="{ui:SymbolIcon Checkmark20}"
+                               Command="{Binding UseBestLevelsCommand}" Margin="8,0,0,0"/>
+                    <ui:Button Grid.Column="2" Content="Try mA, mB" Icon="{ui:SymbolIcon Play20}" Appearance="Primary"
+                               Command="{Binding SweepLevelsCommand}" Margin="8,0,0,0"/>
+                </Grid>
+                <lvc:CartesianChart Height="260" Background="Transparent" LegendPosition="Hidden">
+                    <lvc:CartesianChart.Series>
+                        <lvc:SeriesCollection>
+                            <lvc:XamlColumnSeries Values="{Binding Q6Diff}" SeriesName="Best for this mB"/>
+                        </lvc:SeriesCollection>
+                    </lvc:CartesianChart.Series>
+                    <lvc:CartesianChart.XAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis Labels="{Binding Q6Labels}" AxisName="mB (best mA for each)"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
+                        <lvc:AxesCollection>
+                            <lvc:XamlAxis AxisName="Profit per day vs current levels (LE)"
+                                          LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
+                        </lvc:AxesCollection>
+                    </lvc:CartesianChart.YAxes>
+                </lvc:CartesianChart>
+                <TextBlock Text="Top 10 pairs" FontWeight="SemiBold" Margin="4,8,0,0"/>
+                <DataGrid ItemsSource="{Binding Q6Rows}" Style="{StaticResource PolicyGrid}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="mA" Binding="{Binding LevelA}"/>
+                        <DataGridTextColumn Header="mB" Binding="{Binding LevelB}"/>
+                        <DataGridTextColumn Header="Space ft³" Binding="{Binding Space}"/>
+                        <DataGridTextColumn Header="Profit / day" Binding="{Binding ProfitPerDay, StringFormat=0.00}"/>
+                        <DataGridTextColumn Header="vs current" Binding="{Binding DiffVsCurrent, StringFormat='+0.00;-0.00;0.00'}"/>
+                        <DataGridTextColumn Header="Lost profit / day" Binding="{Binding LostProfitPerDay, StringFormat=0.00}"/>
+                        <DataGridTextColumn Header="Trimmed deliveries / run" Binding="{Binding TrimmedPerRun, StringFormat=0.0}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </ui:Card>
+    </StackPanel>
 </Page>

@@ -10,7 +10,6 @@ public class Store
     /// <summary>Seed used when no seed is given to the constructor.</summary>
     public const ulong DefaultSeed = 123456;
 
-    private LCG rng = new LCG(DefaultSeed);
     
     public DiscreteDistribution DemandA { get; private set; }
     public DiscreteDistribution DemandB { get; private set; }

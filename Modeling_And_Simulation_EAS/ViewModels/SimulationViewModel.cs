@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Modeling_And_Simulation_EAS.Entities;
-using Modeling_And_Simulation_EAS.Random;
 using Modeling_And_Simulation_EAS.Simulation;
 using Wpf.Ui.Controls;
 
@@ -107,6 +106,8 @@ public partial class SimulationViewModel : ObservableObject
 
     [ObservableProperty]
     private IReadOnlyList<RunResult> runResults = [];
+
+    public SimulationSetup? LastSetup { get; private set; }
     
     // ---------------- Commands ----------------
 
@@ -147,6 +148,7 @@ public partial class SimulationViewModel : ObservableObject
             }
 
             RunResults = results;
+            LastSetup = new SimulationSetup(parameters, demanda, demandb, lead, seedValue, reps);
             DayRows = firstRun!.Days.Select(DayRow.From).ToList();
             OrderRows = firstRun.Orders.Select(OrderRow.From).ToList();
 
@@ -162,6 +164,14 @@ public partial class SimulationViewModel : ObservableObject
         {
             ErrorMessage = ex.Message;
         }
+    }
+
+    public void ApplyPolicy(int reviewPeriod, int levelA, int levelB)
+    {
+        ReviewPeriod = reviewPeriod;
+        LevelA = levelA;
+        LevelB = levelB;
+        Compute();
     }
 
     /// <summary>Puts the original distribution tables back and computes again.</summary>
