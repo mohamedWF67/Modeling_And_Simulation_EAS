@@ -47,21 +47,21 @@
                 <lvc:CartesianChart Height="240" Background="Transparent" LegendPosition="Hidden">
                     <lvc:CartesianChart.Series>
                         <lvc:SeriesCollection>
-                            <lvc:XamlColumnSeries Values="{Binding Q1Values}" SeriesName="Ending stock"
+                            <lvc:XamlRowSeries DataLabelsPosition="End" Values="{Binding Q1Values}" SeriesName="Ending stock"
                                                   ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:SeriesCollection>
                     </lvc:CartesianChart.Series>
-                    <lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
                         <lvc:AxesCollection>
                             <lvc:XamlAxis Labels="{Binding Q1Labels}" LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:AxesCollection>
-                    </lvc:CartesianChart.XAxes>
-                    <lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart.YAxes>
+                    <lvc:CartesianChart.XAxes>
                         <lvc:AxesCollection>
                             <lvc:XamlAxis MinLimit="0" AxisName="Units"
                                           LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:AxesCollection>
-                    </lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart.XAxes>
                 </lvc:CartesianChart>
             </StackPanel>
         </ui:Card>
@@ -169,21 +169,21 @@
                 <lvc:CartesianChart Height="220" Background="Transparent" LegendPosition="Hidden">
                     <lvc:CartesianChart.Series>
                         <lvc:SeriesCollection>
-                            <lvc:XamlColumnSeries Values="{Binding Q4Values}" SeriesName="Lead time"
+                            <lvc:XamlRowSeries DataLabelsPosition="End" Values="{Binding Q4Values}" SeriesName="Lead time"
                                                   ShowDataLabels="True" DataLabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:SeriesCollection>
                     </lvc:CartesianChart.Series>
-                    <lvc:CartesianChart.XAxes>
+                    <lvc:CartesianChart.YAxes>
                         <lvc:AxesCollection>
                             <lvc:XamlAxis Labels="{Binding Q4Labels}" LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:AxesCollection>
-                    </lvc:CartesianChart.XAxes>
-                    <lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart.YAxes>
+                    <lvc:CartesianChart.XAxes>
                         <lvc:AxesCollection>
                             <lvc:XamlAxis MinLimit="0" AxisName="Days"
                                           LabelsPaint="{lvc:SolidColorPaint Color='#FFFFFF'}" NamePaint="{lvc:SolidColorPaint Color='#FFFFFF'}"/>
                         </lvc:AxesCollection>
-                    </lvc:CartesianChart.YAxes>
+                    </lvc:CartesianChart.XAxes>
                 </lvc:CartesianChart>
             </StackPanel>
         </ui:Card>
